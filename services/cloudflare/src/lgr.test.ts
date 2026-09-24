@@ -19,6 +19,11 @@ function html(productsData: unknown[]) {
 }
 
 describe("La Grande Récré catalog parser", () => {
+  it("returns no products for an empty or non-catalog response body", () => {
+    expect(parseLgrCatalog("")).toEqual([]);
+    expect(parseLgrCatalog("<html><body>Page sans catalogue</body></html>")).toEqual([]);
+  });
+
   it("keeps Pokémon TCG products and separates web availability from store status", () => {
     const result = parseLgrCatalog(html([
       product("POKEMON MEGA EVOLUTION 05 : PACK PORTFOLIO+BOOSTER NUIT NOIRE", "pack-portfolio"),
