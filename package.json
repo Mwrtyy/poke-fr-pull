@@ -8,7 +8,7 @@
     "dev": "pnpm --filter @poke-fr/web dev",
     "build": "pnpm --filter @poke-fr/web build",
     "typecheck": "pnpm -r typecheck",
-    "test": "pnpm --filter @poke-fr/backend test",
+    "test": "pnpm --filter @poke-fr/backend test && pnpm --filter @poke-fr/cloudflare test",
     "worker": "pnpm --filter @poke-fr/backend worker",
     "api": "pnpm --filter @poke-fr/backend api",
     "db:migrate": "pnpm --filter @poke-fr/backend migrate"

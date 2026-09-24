@@ -1,0 +1,19 @@
+{
+  "name": "@poke-fr/cloudflare",
+  "private": true,
+  "type": "module",
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "pnpm --config.node-linker=hoisted dlx wrangler@4.128.0 dev",
+    "deploy": "pnpm --config.node-linker=hoisted dlx wrangler@4.128.0 deploy",
+    "bundle:dashboard": "pnpm --config.node-linker=hoisted dlx wrangler@4.128.0 deploy --dry-run --outdir dist && node scripts/copy-dashboard-bundle.mjs",
+    "db:migrate:local": "pnpm --config.node-linker=hoisted dlx wrangler@4.128.0 d1 migrations apply pokemon-restock-fr --local",
+    "db:migrate:remote": "pnpm --config.node-linker=hoisted dlx wrangler@4.128.0 d1 migrations apply pokemon-restock-fr --remote",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3",
+    "vitest": "5.0.1"
+  }
+}

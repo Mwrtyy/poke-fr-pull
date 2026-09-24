@@ -1,0 +1,24 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "poke-fr-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-24",
+  "account_id": "427238f7e7728313287e9393e512f407",
+  "workers_dev": true,
+  "limits": { "cpu_ms": 10 },
+  "triggers": { "crons": ["* * * * *"] },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "pokemon-restock-fr",
+      "database_id": "da7beffd-e88b-4aee-aa68-9618562cc8ac",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "vars": {
+    "ALLOWED_ORIGINS": "https://mwrtyy.github.io,http://localhost:3000",
+    "CATALOG_URL": "https://www.lagranderecre.fr/cartes-a-collectionner-pokemon.html",
+    "MIN_CATALOG_INTERVAL_SECONDS": "60",
+    "ROBOTS_TTL_SECONDS": "21600"
+  }
+}

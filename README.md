@@ -38,6 +38,26 @@ Le workflow `.github/workflows/deploy-pages.yml` construit le site pour `https:/
 
 GitHub Pages ne fournit pas de serveur Node.js. Laissez le frontend sans API pour le site statique autonome, ou définissez `NEXT_PUBLIC_API_BASE_URL` comme variable Actions après avoir déployé le backend HTTPS. Cette valeur est publique et ne doit jamais contenir de secret.
 
+## Cloudflare Worker + D1
+
+`services/cloudflare/` contient un worker léger et une migration D1. Le cron demande une fois par minute le catalogue public La Grande Récré, sous réserve de `robots.txt`, d'une cadence minimale de 60 secondes et d'une limite de réponse de 1.5 MB. Le parseur ne garde que les produits Pokémon TCG. Le stock web reste séparé ; aucune donnée du catalogue ne devient stock magasin. Les erreurs, réponses 403, règles robots interdites et dépassements de taille gardent les données précédentes et appliquent un délai de reprise.
+
+Le Worker expose `/healthz` et `/api/v1/feed`. Les routes serveur `/api/v1/alerts` renvoient `503 alerts_not_configured` tant qu'une vraie protection anti-abus n'existe pas ; le site garde les règles dans le navigateur. Les notifications push renvoient `503 push_not_configured` : aucun expéditeur VAPID ni flux de preuves magasin n'est configuré. Le feed ne peut confirmer du stock que si D1 contient une preuve officielle récente, liée à une boutique exacte du même détaillant. Il n'annonce pas de feed live avant un refresh réussi dans les six dernières heures. Chaque refresh réussi remplace atomiquement la liste active, donc produits retirés de la catégorie ne restent pas dans le feed.
+
+Depuis la racine du dépôt, validez et préparez le fichier autonome pour le Dashboard :
+
+```powershell
+pnpm --filter @poke-fr/cloudflare typecheck
+pnpm --filter @poke-fr/cloudflare test
+pnpm --filter @poke-fr/cloudflare bundle:dashboard
+```
+
+Le fichier généré est `services/cloudflare/dist/worker.js`. `dist/` est ignoré par Git. Pour exécuter le Worker avec Wrangler en local, appliquez la migration locale puis lancez `pnpm --filter @poke-fr/cloudflare dev`. Pour déployer via Wrangler, configurez une autorisation Cloudflare limitée, puis appliquez `pnpm --filter @poke-fr/cloudflare db:migrate:remote` avant `pnpm --filter @poke-fr/cloudflare deploy`. Les deux commandes distantes modifient les ressources Cloudflare et n'ont pas été exécutées par cette préparation.
+
+Pour coller le bundle dans l'éditeur Dashboard, appliquez les migrations `services/cloudflare/migrations/0001_initial.sql` puis `0002_catalog_presence.sql` dans la console D1, reliez le binding `DB`, et configurez le cron `* * * * *`. Configurez `ALLOWED_ORIGINS` avec `https://mwrtyy.github.io,http://localhost:3000`; valeurs de source et cadence ont des replis intégrés. Après validation du déploiement, configurez la variable GitHub Actions `NEXT_PUBLIC_API_BASE_URL` avec l'URL du Worker et relancez le build Pages.
+
+Le Worker est réservé sous `poke-fr-api`; ce nom ne signifie pas qu'il tourne déjà en production. Ce Worker ne surveille pas encore Fnac, King Jouet ou Carrefour.
+
 ## Backend externe
 
 Le service backend fournit l'API et des processus workers séparés. Il peut être déployé sur un hébergeur de conteneurs externe. Configurez `DATABASE_URL`, `REDIS_URL`, `API_CORS_ORIGINS` et, si Web Push est voulu, `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` et `VAPID_SUBJECT`. Appliquez `db/migrations/001_initial.sql` à PostgreSQL/Supabase avant le démarrage.
