@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import worker, { verifiedObservation } from "./index.js";
 import type { D1Database, D1PreparedStatement, D1Result } from "./d1.js";
 
@@ -70,6 +70,55 @@ describe("public API readiness", () => {
 
     expect(response.status).toBe(503);
     expect(await response.json()).toMatchObject({ error: "alerts_not_configured" });
+  });
+});
+
+describe("robots fetch diagnostics", () => {
+  it("logs and persists a redacted fetch failure while keeping the refresh closed", async () => {
+    const updates: Array<{ query: string; values: unknown[] }> = [];
+    const db: D1Database = {
+      prepare(query) {
+        let values: unknown[] = [];
+        const statement: D1PreparedStatement = {
+          bind(...bound) { values = bound; return statement; },
+          async first<T>() {
+            if (query.includes("RETURNING source_id")) return { source_id: "la-grande-recre:tcg-category" } as T;
+            if (query.includes("SELECT consecutive_failures")) return { consecutive_failures: 2 } as T;
+            return null;
+          },
+          async all<T>() { return { results: [] as T[], success: true, meta: { changes: 0 } }; },
+          async run<T>() {
+            if (query.includes("last_error = ?")) updates.push({ query, values });
+            return { results: [] as T[], success: true, meta: { changes: 1 } };
+          },
+        };
+        return statement;
+      },
+      async batch<T>() { return [] as D1Result<T>[]; },
+    };
+    const log = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    vi.stubGlobal("fetch", async () => {
+      throw new TypeError("redirect mode rejected https://private.example/path?token=secret-value");
+    });
+    let refresh: Promise<void> | undefined;
+    try {
+      worker.scheduled({ cron: "* * * * *", scheduledTime: Date.now() } as never, { DB: db } as never, {
+        waitUntil(promise: Promise<unknown>) { refresh = promise.then(() => undefined); },
+      } as never);
+      if (!refresh) throw new Error("scheduled refresh was not queued");
+      await refresh;
+
+      const diagnostic = log.mock.calls.find(([event]) => event === "lgr_robots_fetch_failed")?.[1];
+      expect(diagnostic).toMatchObject({ code: "redirect", name: "TypeError" });
+      expect(JSON.stringify(diagnostic)).not.toContain("private.example");
+      expect(JSON.stringify(diagnostic)).not.toContain("secret-value");
+      const failure = updates.find(({ query }) => query.includes("last_error = ?"))?.values[2];
+      expect(failure).toBe("robots_unavailable:redirect:TypeError:redirect mode rejected [url]");
+      expect(String(failure)).not.toContain("secret-value");
+    } finally {
+      log.mockRestore();
+      vi.unstubAllGlobals();
+    }
   });
 });
 

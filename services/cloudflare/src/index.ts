@@ -367,8 +367,10 @@ async function getRobotsText(env: Env, catalogUrl: URL, now: number): Promise<st
         Accept: "text/plain",
       },
     });
-  } catch {
-    throw new SourceFetchError("robots_unavailable");
+  } catch (error) {
+    const diagnostic = fetchErrorDiagnostic(error);
+    console.error("lgr_robots_fetch_failed", diagnostic);
+    throw new SourceFetchError(`robots_unavailable:${diagnostic.code}:${diagnostic.name}:${diagnostic.message}`);
   }
   if (!response.ok) {
     await saveRobots(env, now, response.status, null);
@@ -431,4 +433,29 @@ function hashText(value: string): string {
 
 function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message.slice(0, 240) : "refresh_failed";
+}
+
+function fetchErrorDiagnostic(error: unknown) {
+  const rawName = error instanceof Error ? error.name : "UnknownError";
+  const rawMessage = error instanceof Error ? error.message : "non-Error rejection";
+  const normalized = `${rawName} ${rawMessage}`;
+  const code = /timeout|timed?\s*out|aborted/iu.test(normalized)
+    ? "timeout"
+    : /redirect/iu.test(normalized)
+      ? "redirect"
+      : rawName.toLowerCase() === "typeerror" ? "typeerror" : "fetch_error";
+  return {
+    code,
+    name: safeDiagnosticText(rawName, 32) || "UnknownError",
+    message: safeDiagnosticText(rawMessage, 120) || "(empty)",
+  };
+}
+
+function safeDiagnosticText(value: string, maxLength: number): string {
+  return value
+    .replace(/https?:\/\/[^\s"'<>]+/giu, "[url]")
+    .replace(/\b(bearer|basic)\s+\S+/giu, "$1 [redacted]")
+    .replace(/\b(authorization|(?:api[_ -]?)?key|token|secret|password)\b\s*[:=]\s*[^\s,;]+/giu, "$1=[redacted]")
+    .replace(/[\u0000-\u001f\u007f]+/gu, " ")
+    .slice(0, maxLength);
 }
