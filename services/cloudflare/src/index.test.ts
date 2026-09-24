@@ -122,6 +122,50 @@ describe("robots fetch diagnostics", () => {
   });
 });
 
+describe("catalog redirects", () => {
+  it("rejects a robots redirect without requesting its Location", async () => {
+    const db = cronDatabase();
+    const calls: Array<{ url: string; redirect: RequestRedirect | undefined }> = [];
+    vi.stubGlobal("fetch", async (input: RequestInfo | URL, init?: RequestInit) => {
+      calls.push({ url: String(input), redirect: init?.redirect });
+      return new Response(null, { status: 302, headers: { Location: "https://outside.example/robots.txt" } });
+    });
+
+    try {
+      await runScheduled(db.database);
+      expect(calls).toEqual([{ url: "https://www.lagranderecre.fr/robots.txt", redirect: "manual" }]);
+      expect(db.updates.find(({ query }) => query.includes("last_error = ?"))?.values[2]).toBe("robots_redirect_302");
+      expect(db.batchCount()).toBe(0);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it("rejects a catalog redirect without requesting its Location", async () => {
+    const db = cronDatabase();
+    const calls: Array<{ url: string; redirect: RequestRedirect | undefined }> = [];
+    vi.stubGlobal("fetch", async (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = String(input);
+      calls.push({ url, redirect: init?.redirect });
+      return url.endsWith("/robots.txt")
+        ? new Response("User-agent: *\nAllow: /\n")
+        : new Response(null, { status: 307, headers: { Location: "https://outside.example/catalog.html" } });
+    });
+
+    try {
+      await runScheduled(db.database);
+      expect(calls).toEqual([
+        { url: "https://www.lagranderecre.fr/robots.txt", redirect: "manual" },
+        { url: "https://www.lagranderecre.fr/cartes-a-collectionner-pokemon.html", redirect: "manual" },
+      ]);
+      expect(db.updates.find(({ query }) => query.includes("last_error = ?"))?.values[2]).toBe("catalog_redirect_307");
+      expect(db.batchCount()).toBe(0);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+});
+
 function stubDatabase(first: unknown): D1Database {
   const statement: D1PreparedStatement = {
     bind() { return statement; },
@@ -130,4 +174,39 @@ function stubDatabase(first: unknown): D1Database {
     async run<T>() { return { results: [] as T[], success: true, meta: { changes: 0 } }; },
   };
   return { prepare() { return statement; }, async batch<T>() { return [] as D1Result<T>[]; } };
+}
+
+function cronDatabase() {
+  const updates: Array<{ query: string; values: unknown[] }> = [];
+  let batchCount = 0;
+  const database: D1Database = {
+    prepare(query) {
+      let values: unknown[] = [];
+      const statement: D1PreparedStatement = {
+        bind(...bound) { values = bound; return statement; },
+        async first<T>() {
+          if (query.includes("RETURNING source_id")) return { source_id: "la-grande-recre:tcg-category" } as T;
+          if (query.includes("SELECT consecutive_failures")) return { consecutive_failures: 0 } as T;
+          return null;
+        },
+        async all<T>() { return { results: [] as T[], success: true, meta: { changes: 0 } }; },
+        async run<T>() {
+          updates.push({ query, values });
+          return { results: [] as T[], success: true, meta: { changes: 1 } };
+        },
+      };
+      return statement;
+    },
+    async batch<T>() { batchCount++; return [] as D1Result<T>[]; },
+  };
+  return { database, updates, batchCount: () => batchCount };
+}
+
+async function runScheduled(database: D1Database): Promise<void> {
+  let refresh: Promise<void> | undefined;
+  worker.scheduled({ cron: "* * * * *", scheduledTime: Date.now() } as never, { DB: database } as never, {
+    waitUntil(promise: Promise<unknown>) { refresh = promise.then(() => undefined); },
+  } as never);
+  if (!refresh) throw new Error("scheduled refresh was not queued");
+  await refresh;
 }

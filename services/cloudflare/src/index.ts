@@ -251,6 +251,10 @@ class SourceFetchError extends Error {
   }
 }
 
+function isRedirectResponse(response: Response): boolean {
+  return response.type === "opaqueredirect" || (response.status >= 300 && response.status < 400);
+}
+
 async function refreshCatalog(env: Env): Promise<void> {
   const now = epochSeconds();
   const acquired = await env.DB.prepare(`
@@ -272,12 +276,16 @@ async function refreshCatalog(env: Env): Promise<void> {
 
     const response = await fetch(catalogUrl, {
       signal: AbortSignal.timeout(8_000),
-      redirect: "error",
+      redirect: "manual",
       headers: {
         "User-Agent": "PokemonRestockFRBot/0.1 (+https://github.com/Mwrtyy/poke-fr-pull)",
         Accept: "text/html,application/xhtml+xml",
       },
     });
+    if (isRedirectResponse(response)) {
+      const status = response.status >= 300 && response.status < 400 ? response.status : null;
+      throw new SourceFetchError(`catalog_redirect_${status ?? "opaque"}`, status);
+    }
     if (!response.ok) throw new SourceFetchError(`catalog_http_${response.status}`, response.status);
     const html = await readTextLimited(response, MAX_CATALOG_BYTES);
     const products = parseLgrCatalog(html, catalogUrl.toString());
@@ -361,7 +369,7 @@ async function getRobotsText(env: Env, catalogUrl: URL, now: number): Promise<st
   try {
     response = await fetch(robotsUrl, {
       signal: AbortSignal.timeout(8_000),
-      redirect: "error",
+      redirect: "manual",
       headers: {
         "User-Agent": "PokemonRestockFRBot/0.1 (+https://github.com/Mwrtyy/poke-fr-pull)",
         Accept: "text/plain",
@@ -371,6 +379,11 @@ async function getRobotsText(env: Env, catalogUrl: URL, now: number): Promise<st
     const diagnostic = fetchErrorDiagnostic(error);
     console.error("lgr_robots_fetch_failed", diagnostic);
     throw new SourceFetchError(`robots_unavailable:${diagnostic.code}:${diagnostic.name}:${diagnostic.message}`);
+  }
+  if (isRedirectResponse(response)) {
+    const status = response.status >= 300 && response.status < 400 ? response.status : null;
+    await saveRobots(env, now, status ?? 0, null);
+    throw new SourceFetchError(`robots_redirect_${status ?? "opaque"}`, status);
   }
   if (!response.ok) {
     await saveRobots(env, now, response.status, null);
