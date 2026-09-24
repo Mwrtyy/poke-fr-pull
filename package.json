@@ -1,0 +1,16 @@
+{
+  "name": "poke-fr-pull",
+  "private": true,
+  "type": "module",
+  "version": "0.1.0",
+  "packageManager": "pnpm@11.19.0",
+  "scripts": {
+    "dev": "pnpm --filter @poke-fr/web dev",
+    "build": "pnpm --filter @poke-fr/web build",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm --filter @poke-fr/backend test",
+    "worker": "pnpm --filter @poke-fr/backend worker",
+    "api": "pnpm --filter @poke-fr/backend api",
+    "db:migrate": "pnpm --filter @poke-fr/backend migrate"
+  }
+}

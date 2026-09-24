@@ -4,7 +4,7 @@ Site mobile-first de découverte de références Pokémon TCG et de suivi de sto
 
 ## État des données
 
-Le site ne contient aucun faux stock ni magasin fictif. Sans backend configuré, il affiche un état vide et explique que les disponibilités live ne sont pas branchées. Une page produit ou un stock web ne prouve pas la disponibilité en magasin. Toute disponibilité magasin exige un magasin exact, une source officielle, une heure de vérification et une preuve explicite. Un refus HTTP 403, une règle robots ou une erreur de parsing donnent `unknown`.
+Le dépôt contient un snapshot build-time du catalogue public La Grande Récré : références, prix, images et liens produit. Chaque snapshot porte son heure et sa source. Le stock magasin reste `unknown` sans preuve pour une boutique exacte ; le stock web ne compte jamais comme disponibilité magasin. Un refus HTTP 403 ou une erreur de parsing garde le dernier snapshot, sans prétendre l'avoir actualisé.
 
 Les sources initiales sont Fnac, King Jouet, Carrefour et La Grande Récré en priorité Île-de-France. Les adaptateurs n'utilisent que les URL publiques autorisées par `robots.txt`. Le moniteur ne contourne ni refus d'accès ni CAPTCHA. Les endpoints de sélection de magasin privés et les chemins interdits ne sont pas appelés.
 
@@ -34,7 +34,7 @@ pnpm build
 
 ## GitHub Pages
 
-Le workflow `.github/workflows/deploy-pages.yml` construit le site pour `https://mwrtyy.github.io/poke-fr-pull/`. Dans GitHub, activez **Settings → Pages → Build and deployment → GitHub Actions**. Chaque publication produit les fichiers statiques dans `apps/web/out`.
+Le workflow `.github/workflows/deploy-pages.yml` construit le site pour `https://mwrtyy.github.io/poke-fr-pull/`. La source GitHub Pages doit être **GitHub Actions**. À chaque publication et toutes les six heures, il tente de rafraîchir le catalogue avant de produire les fichiers statiques dans `apps/web/out`.
 
 GitHub Pages ne fournit pas de serveur Node.js. Laissez le frontend sans API pour le site statique autonome, ou définissez `NEXT_PUBLIC_API_BASE_URL` comme variable Actions après avoir déployé le backend HTTPS. Cette valeur est publique et ne doit jamais contenir de secret.
 
@@ -79,4 +79,3 @@ Chaque adaptateur convertit les sources au contrat commun `RetailerProduct` et `
 ## Propriété intellectuelle
 
 Projet indépendant non affilié aux enseignes, à The Pokémon Company, Nintendo ou Creatures Inc. Les marques et visuels appartiennent à leurs propriétaires. Les images restent servies par la source marchande.
-

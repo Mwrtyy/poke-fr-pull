@@ -1,0 +1,132 @@
+{
+  "builtAt": "2026-09-24T19:33:31.022Z",
+  "source": "https://www.lagranderecre.fr/cartes-a-collectionner-pokemon.html",
+  "items": [
+    {
+      "id": "snapshot:921599",
+      "retailer": {
+        "id": "la-grande-recre",
+        "name": "La Grande Récré"
+      },
+      "product": {
+        "title": "POKEMON MEGA EVOLUTION 05 : PACK PORTFOLIO+BOOSTER NUIT NOIRE",
+        "ean": null,
+        "imageUrl": "https://lagranderecre-lagranderecre-fr-storage.omn.proximis.com/Imagestorage/imagesSynchro/400/400/6b6f8353146d4201af235e112966e1b3cdbeb187_921599-1.jpeg",
+        "productUrl": "https://www.lagranderecre.fr/jeux-de-societe/cartes-a-collectionner/pokemon-mega-evolution-05-pack-portfolio-booster-nuit-noire.html"
+      },
+      "priceCents": 2499,
+      "webAvailability": "available",
+      "status": "unknown",
+      "store": null,
+      "checkedAt": "2026-09-24T19:33:31.022Z",
+      "confidence": null,
+      "evidence": null,
+      "snapshot": true
+    },
+    {
+      "id": "snapshot:874882",
+      "retailer": {
+        "id": "la-grande-recre",
+        "name": "La Grande Récré"
+      },
+      "product": {
+        "title": "Kit d'Initiation Pokémon - Février",
+        "ean": null,
+        "imageUrl": "https://lagranderecre-lagranderecre-fr-storage.omn.proximis.com/Imagestorage/imagesSynchro/400/400/eceae768917539bde627b18d2c985d7520ab25e5_874882-1.jpeg",
+        "productUrl": "https://www.lagranderecre.fr/jeux-de-societe/cartes-a-collectionner/kit-d-initiation-pokemon-fevrier.html"
+      },
+      "priceCents": 599,
+      "webAvailability": "available",
+      "status": "unknown",
+      "store": null,
+      "checkedAt": "2026-09-24T19:33:31.022Z",
+      "confidence": null,
+      "evidence": null,
+      "snapshot": true
+    },
+    {
+      "id": "snapshot:896744",
+      "retailer": {
+        "id": "la-grande-recre",
+        "name": "La Grande Récré"
+      },
+      "product": {
+        "title": "Académie de Combat Pokémon - Nouvelle édition",
+        "ean": null,
+        "imageUrl": "https://lagranderecre-lagranderecre-fr-storage.omn.proximis.com/Imagestorage/imagesSynchro/400/400/0e5a0ec7281d5d09b57eaebe9c74645570e0abbb_896744-1.jpeg",
+        "productUrl": "https://www.lagranderecre.fr/jeux-de-societe/cartes-a-collectionner/academie-de-combat-pokemon-nouvelle-edition.html"
+      },
+      "priceCents": 2999,
+      "webAvailability": "available",
+      "status": "unknown",
+      "store": null,
+      "checkedAt": "2026-09-24T19:33:31.022Z",
+      "confidence": null,
+      "evidence": null,
+      "snapshot": true
+    },
+    {
+      "id": "snapshot:0196214139121",
+      "retailer": {
+        "id": "la-grande-recre",
+        "name": "La Grande Récré"
+      },
+      "product": {
+        "title": "Pokébox Méga Clair de Lune Méga-Ectoplasma-ex",
+        "ean": null,
+        "imageUrl": "https://lagranderecre-lagranderecre-fr-storage.omn.proximis.com/Imagestorage/imagesSynchro/400/400/1713886633fd44174bb01b6a5eca3a85de660385_0196214139121-1.jpeg",
+        "productUrl": "https://www.lagranderecre.fr/jeux-de-societe/cartes-a-collectionner/pokebox-mega-clair-de-lune-mega-ectoplasma-ex.html"
+      },
+      "priceCents": 2699,
+      "webAvailability": "available",
+      "status": "unknown",
+      "store": null,
+      "checkedAt": "2026-09-24T19:33:31.022Z",
+      "confidence": null,
+      "evidence": null,
+      "snapshot": true
+    },
+    {
+      "id": "snapshot:0196214141926",
+      "retailer": {
+        "id": "la-grande-recre",
+        "name": "La Grande Récré"
+      },
+      "product": {
+        "title": "Pack 2 boosters + Piece Ronflex + Carte Zarude Pokemon",
+        "ean": null,
+        "imageUrl": "https://lagranderecre-lagranderecre-fr-storage.omn.proximis.com/Imagestorage/imagesSynchro/400/400/0294dd990501ffacf454a544a25578e50a898121_0196214141926-1.jpeg",
+        "productUrl": "https://www.lagranderecre.fr/jeux-de-societe/cartes-a-collectionner/pack-2-boosters-piece-ronflex-carte-zarude-pokemon.html"
+      },
+      "priceCents": 1499,
+      "webAvailability": "available",
+      "status": "unknown",
+      "store": null,
+      "checkedAt": "2026-09-24T19:33:31.022Z",
+      "confidence": null,
+      "evidence": null,
+      "snapshot": true
+    },
+    {
+      "id": "snapshot:0196214139183",
+      "retailer": {
+        "id": "la-grande-recre",
+        "name": "La Grande Récré"
+      },
+      "product": {
+        "title": "Pokébox Méga Clair de Lune Mélodelfe",
+        "ean": null,
+        "imageUrl": "https://lagranderecre-lagranderecre-fr-storage.omn.proximis.com/Imagestorage/imagesSynchro/400/400/2ea48a2320f68c0118c0bf26dcd2fe8613c174e6_0196214139183-1.jpeg",
+        "productUrl": "https://www.lagranderecre.fr/jeux-de-societe/cartes-a-collectionner/pokebox-mega-clair-de-lune-melodelfe.html"
+      },
+      "priceCents": 2699,
+      "webAvailability": "available",
+      "status": "unknown",
+      "store": null,
+      "checkedAt": "2026-09-24T19:33:31.022Z",
+      "confidence": null,
+      "evidence": null,
+      "snapshot": true
+    }
+  ]
+}
