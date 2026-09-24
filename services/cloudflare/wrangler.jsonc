@@ -5,7 +5,6 @@
   "compatibility_date": "2026-09-24",
   "account_id": "427238f7e7728313287e9393e512f407",
   "workers_dev": true,
-  "limits": { "cpu_ms": 10 },
   "triggers": { "crons": ["* * * * *"] },
   "d1_databases": [
     {

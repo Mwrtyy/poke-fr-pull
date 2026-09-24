@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       NEXT_PUBLIC_BASE_PATH: /poke-fr-pull
-      NEXT_PUBLIC_API_BASE_URL: ${{ vars.NEXT_PUBLIC_API_BASE_URL }}
+      NEXT_PUBLIC_API_BASE_URL: https://poke-fr-api.kais-battaia.workers.dev
       CATALOG_FALLBACK_URL: https://mwrtyy.github.io/poke-fr-pull/catalog.json
     steps:
       - name: Checkout
